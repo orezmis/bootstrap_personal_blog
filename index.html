@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>OREZMIS!</title>
+        <link href="./bootstrap/css/bootstrap.min.css" rel="stylesheet" type="text/css">
+        
+        <script type="text/javascript" src="add_two_numbers.js"></script>
+        <script type="text/javascript" src="what_time_is_it.js"></script>
+
+    </head>
+    <body>
+        <nav class="navbar navbar-expand-lg bg-light">
+            <div class="container-fluid">
+              <a class="navbar-brand" href="./index.html">OREZMIS</a>
+              <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+              </button>
+              <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                  <li class="nav-item">
+                    <a class="nav-link active" aria-current="page" href="./index.html">Home</a>
+                  </li>
+                  <li class="nav-item">
+                    <a class="nav-link active" aria-current="page" href="./blog_list.html">Blog</a>
+                  </li>
+                  <li class="nav-item">
+                    <a class="nav-link active" aria-current="page" href="./about_me.html">About Me</a>
+                  </li>
+                  <li class="nav-item">
+                    <a class="nav-link" href="#">Link</a>
+                  </li>
+                  <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                      Dropdown
+                    </a>
+                    <ul class="dropdown-menu">
+                      <li><a class="dropdown-item" href="#">Action</a></li>
+                      <li><a class="dropdown-item" href="#">Another action</a></li>
+                      <li><hr class="dropdown-divider"></li>
+                      <li><a class="dropdown-item" href="#">Something else here</a></li>
+                    </ul>
+                  </li>
+                  <li class="nav-item">
+                    <a class="nav-link disabled">Disabled</a>
+                  </li>
+                </ul>
+                <form class="d-flex" role="search">
+                  <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search">
+                  <button class="btn btn-outline-success" type="submit">Search</button>
+                </form>
+              </div>
+            </div>
+          </nav>
+
+        <h1>첫번째 크기 헤드라인</h1>
+        <h2>두번째 크기 헤드라인</h2>
+        <h3>세번째 크기 헤드라인</h3>
+        <h4>네번째 크기 헤드라인</h4>
+        <h5>다섯번째 크기 헤드라인</h5>
+
+        <button onclick="whatTimeIsIt()">현재시간</button>
+
+        <label for="inputA">a</label>
+        <input id="inputA" value=1 onkeyup="doSomething()">
+        <lable for="inputB">b</lable>
+        <input id="inputB" value=2 onkeyup="doSomething()">
+
+        <p>
+            <span id="valueA">1</span> + <span id="valueB">2</span> = <span id="valueC">3</span> 입니다.
+        </p>
+        
+        <p>문단은 p로 쓰쇼잉~</p>
+        <a href="https://www.google.com">google로 고고</a>
+        <hr/>
+        <img src="./images/1.jpg" width="600px">
+        <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js" integrity="sha384-oBqDVmMz9ATKxIep9tiCxS/Z9fNfEXiDAYTujMAeBAsjFuCZSmKbSSUnQlmh/jp3" crossorigin="anonymous"></script>
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.min.js" integrity="sha384-cuYeSxntonz0PPNlHhBs68uyIAVpIIOZZ5JqeqvYYIcEL727kskC66kF92t6Xl2V" crossorigin="anonymous"></script>
+    </body>
+</html>
