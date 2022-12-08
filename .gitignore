@@ -1,7 +1,7 @@
 # Byte-compiled / optimized / DLL files
-__pycache__/
-*.py[cod]
-*$py.class
+**/__pycache__/
+**/*.py[cod]
+**/*$py.class
 
 # C extensions
 *.so
@@ -133,4 +133,7 @@ dmypy.json
 ###################
 # PROJECT IGNORES #
 ###################
-bootstrap-5.2.3-dist/
+**/bootstrap-5.2.3-dist/
+**/db.sqlite3
+**/venv/
+**/migrations/
