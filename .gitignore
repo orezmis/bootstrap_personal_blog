@@ -137,3 +137,4 @@ dmypy.json
 **/db.sqlite3
 **/venv/
 **/migrations/
+**/_media/
