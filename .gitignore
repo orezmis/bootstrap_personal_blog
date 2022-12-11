@@ -138,3 +138,4 @@ dmypy.json
 **/venv/
 **/migrations/
 **/_media/
+*.old
