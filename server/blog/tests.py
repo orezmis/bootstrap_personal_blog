@@ -38,7 +38,7 @@ class TestView(TestCase):
         self.assertIn('Categories', categories_card.text)
         self.assertIn(f'{self.category_one.name} ({self.category_one.post_set.count()})', categories_card.text)
         self.assertIn(f'{self.category_two.name} ({self.category_two.post_set.count()})', categories_card.text)
-        self.assertIn(f'미분류 (1)', categories_card.text)
+        self.assertIn(f'미분류', categories_card.text)
 
     # /blog/ 경로에 접속해서 원하는 페이지가 나오는지 확인하며, 게시물이 잘 쓰여지는지 확인하는 테스트 시나리오
     def test_post_list(self):
@@ -156,24 +156,28 @@ class TestView(TestCase):
             author=self.user_one
         )
 
-        self.assertEqual(post_001.get_absolute_url(), '/blog/1/')
+        self.assertEqual(self.post_001.get_absolute_url(), '/blog/1/')
 
-        response = self.client.get(post_001.get_absolute_url())
+        response = self.client.get(self.post_001.get_absolute_url())
         self.assertEqual(response.status_code, 200)
         soup = BeautifulSoup(response.content, 'html.parser')
 
         # 1.4. 네비게이션 바가 있는지 확인
         self.navbar_test(soup)
 
-        self.assertIn(post_001.title, soup.title.text)
+        # 1.5. 카테고리가 있는지 확인
+        self.category_card_test(soup)
+
+        self.assertIn(self.post_001.title, soup.title.text)
 
         main_area = soup.find('div', id='main-area')
         post_area = main_area.find('div', id='post-area')
-        self.assertIn(post_001.title, post_area.text)
+        self.assertIn(self.post_001.title, post_area.text)
+        self.assertIn(self.category_one.name, post_area.text)
 
         self.assertIn(self.user_one.username.upper(), post_area.text)
 
-        self.assertIn(post_001.content, post_area.text)
+        self.assertIn(self.post_001.content, post_area.text)
 
     
     def navbar_test(self, soup):
