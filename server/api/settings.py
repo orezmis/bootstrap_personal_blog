@@ -26,7 +26,11 @@ SECRET_KEY = 'django-insecure-oldg5=@(f9gt3a%w&vt7ecsh5jxgzy3(=0#s#&*qa3@x7b+ijj
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['192.168.0.201']
+ALLOWED_HOSTS = [
+    '192.168.0.201',
+    'orezmis.duckdns.org',
+    'orezmis.iptime.org'
+]
 
 
 # Application definition
