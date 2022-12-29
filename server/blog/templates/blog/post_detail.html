@@ -14,16 +14,34 @@
                 <!-- Post title-->
                 <h1 class="fw-bolder mb-1">{{ post.title }}</h1>
                 <h5 class="text-muted">{{ post.hook_text }}</h5>
+
+                <!-- ORIGINAL STYLE -->
                 <!-- Post meta content-->
                 <div class="text-muted fst-italic mb-2">{{ post.created_at }} by {{ post.author | upper }}</div>
                 <!-- Post categories-->
                 {% if post.category %}
-                    <span class="badge bg-secondary float-right">{{ post.category }}</span>
+                    <span class="badge bg-secondary">{{ post.category }}</span>
                 {% else %}
-                    <span class="badge bg-secondary float-right">미분류</span>
-                {% endif %}
-                <!-- <a class="badge bg-secondary text-decoration-none link-light" href="#!">Web Design</a>
-                <a class="badge bg-secondary text-decoration-none link-light" href="#!">Freebies</a> -->
+                    <span class="badge bg-secondary">미분류</span>
+                {% endif %}                
+
+                <!-- ONE LINE STYLE -->
+                <!-- <div class="card-body">
+                    <div class="container">
+                        <div class="row"> -->
+                            <!-- Post meta content-->
+                            <!-- <div class="col-8 text-muted fst-italic mb-2 g-0">{{ post.created_at }} by {{ post.author | upper }}</div> -->
+                            <!-- Post categories-->
+                            <!-- <div class="col-4">
+                            {% if post.category %}
+                                <span class="badge bg-secondary float-end">{{ post.category }}</span>
+                            {% else %}
+                                <span class="badge bg-secondary float-end">미분류</span>
+                            {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div> -->
             </header>
             <!-- Preview image figure-->
             {% if post.head_image %}
