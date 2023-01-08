@@ -1,7 +1,7 @@
 from django.test import TestCase, Client
 from bs4 import BeautifulSoup
 from django.contrib.auth.models import User
-from .models import Post, Category
+from .models import Post, Category, Tag
 
 # TDD 를 위한 기본 테스트 시나리오:
 class TestView(TestCase):
@@ -12,12 +12,17 @@ class TestView(TestCase):
         self.category_one = Category.objects.create(name='cat_one', slug='metal')
         self.category_two = Category.objects.create(name='cat_two', slug='slug')
 
+        self.tag_one = Tag.objects.create(name='tagmatch', slug='tagmatch')
+        self.tag_two = Tag.objects.create(name='smackdown', slug='smackdown')
+        self.tag_sam = Tag.objects.create(name='samryongee', slug='samryongee')
+
         self.post_001 = Post.objects.create(
             title='첫 번째 포스트입니다.',
             content='Hello world!',
             category=self.category_one,
             author=self.user_one
         )
+        self.post_001.tags.add(self.tag_one)
 
         self.post_002 = Post.objects.create(
             title='두번째 포스트',
@@ -31,6 +36,8 @@ class TestView(TestCase):
             content='왜요..',
             author=self.user_two
         )
+        self.post_003.tags.add(self.tag_two)
+        self.post_003.tags.add(self.tag_sam)
 
 
     def category_card_test(self, soup):
@@ -58,17 +65,25 @@ class TestView(TestCase):
         post_001_card = main_area.find('div', id='post-1')
         self.assertIn(self.post_001.title, post_001_card.text)
         self.assertIn(self.post_001.category.name, post_001_card.text)
+        self.assertIn(self.tag_one.name, post_001_card.text)
+        self.assertNotIn(self.tag_two.name, post_001_card.text)
+        self.assertNotIn(self.tag_sam.name, post_001_card.text)
 
         post_002_card = main_area.find('div', id='post-2')
         self.assertIn(self.post_002.title, post_002_card.text)
         self.assertIn(self.post_002.category.name, post_002_card.text)
+        self.assertNotIn(self.tag_one.name, post_002_card.text)
+        self.assertNotIn(self.tag_two.name, post_002_card.text)
+        self.assertNotIn(self.tag_sam.name, post_002_card.text)
 
         post_003_card = main_area.find('div', id='post-3')
         self.assertIn('미분류', post_003_card.text)
         self.assertIn(self.post_003.title, post_003_card.text)
-
         self.assertIn(self.user_one.username.upper(), main_area.text)
         self.assertIn(self.user_two.username.upper(), main_area.text)
+        self.assertNotIn(self.tag_one.name, post_003_card.text)
+        self.assertIn(self.tag_two.name, post_003_card.text)
+        self.assertIn(self.tag_sam.name, post_003_card.text)
 
         # without post
         Post.objects.all().delete()
@@ -178,6 +193,10 @@ class TestView(TestCase):
         self.assertIn(self.user_one.username.upper(), post_area.text)
 
         self.assertIn(self.post_001.content, post_area.text)
+
+        self.assertIn(self.tag_one.name, post_area.text)
+        self.assertNotIn(self.tag_two.name, post_area.text)
+        self.assertNotIn(self.tag_sam.name, post_area.text)
 
     
     def navbar_test(self, soup):
