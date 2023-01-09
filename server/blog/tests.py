@@ -16,6 +16,9 @@ class TestView(TestCase):
         self.tag_two = Tag.objects.create(name='smackdown', slug='smackdown')
         self.tag_sam = Tag.objects.create(name='samryongee', slug='samryongee')
 
+        self.user_two.is_staff = True
+        self.user_two.save()
+
         self.post_001 = Post.objects.create(
             title='첫 번째 포스트입니다.',
             content='Hello world!',
@@ -229,5 +232,54 @@ class TestView(TestCase):
         main_area = soup.find('div', id='main-area')
         self.assertIn(self.category_one.name, main_area.text)
         self.assertIn(self.post_001.title, main_area.text)
-        self.assertNotIn(self.post_002.title, main_area.text) 
+        self.assertNotIn(self.post_002.title, main_area.text)
         self.assertNotIn(self.post_003.title, main_area.text)
+
+    def test_tag_page(self):
+        response = self.client.get(self.tag_one.get_absolute_url())
+        self.assertEqual(response.status_code, 200)
+        soup =BeautifulSoup(response.content, 'html.parser')
+
+        self.navbar_test(soup)
+        self.category_card_test(soup)
+
+        self.assertIn(self.tag_one.name, soup.text)
+
+
+        main_area = soup.find('div', id='main-area')
+        self.assertIn(self.tag_one.name, main_area.text)
+
+        self.assertIn(self.post_001.title, main_area.text)
+        self.assertNotIn(self.post_002.title, main_area.text)
+        self.assertNotIn(self.post_003.title, main_area.text)
+
+    def test_create_post(self):
+        # no login, no response 200!
+        response = self.client.get('/blog/create_post/')
+        self.assertNotEqual(response.status_code, 200)
+
+        # no staff login case
+        self.client.login(username='user_one', password='password1')
+        response = self.client.get('/blog/create_post/')
+        self.assertNotEqual(response.status_code, 200)
+        
+        # yes staff login, yes 200
+        self.client.login(username='user_two', password='password2')
+        response = self.client.get('/blog/create_post/')
+        self.assertEqual(response.status_code, 200)
+        soup = BeautifulSoup(response.content, 'html.parser')
+
+        self.assertEqual('Create Post - Blog', soup.title.text)
+        main_area = soup.find('div', id='main-area')
+        self.assertIn('Create New Post', main_area.text)
+
+        self.client.post(
+            '/blog/create_post/',
+            {
+                'title': 'ULTRA KILL',
+                'content': 'GGGGGGGGOD  LLLLLIKE'
+            }
+        )
+        last_post = Post.objects.last()
+        self.assertEqual(last_post.title, "ULTRA KILL")
+        self.assertEqual(last_post.author.username, "user_two")

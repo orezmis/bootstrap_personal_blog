@@ -1,15 +1,29 @@
 {% extends 'blog/base.html' %}
 
 {% block main_area %}
+
+{% if user.is_authenticated %}
+  {% if user.is_superuser or user.is_staff %}
+    <a class="btn btn-primary float-end" href="/blog/create_post/" role="button"><i class="fa-solid fa-feather"></i></a>
+  {% endif %}
+{% endif %}
   <div class="container">
-    <div class="row">
-      <div class="col-10 g-0"><h1>Blog</h1></div>
-      <div class="col-2 m-auto">
-        {% if category %}
-          <h5><span class="badge bg-secondary float-end">{{ category }}</span></h5>
-        {% endif %}
-      </div>
-    </div>
+    <h1>
+      Blog
+      {% if tag %}
+        <button type="button" class="btn btn-dark position-relative" style="--bs-btn-padding-y: .10rem; --bs-btn-padding-x: .5rem; --bs-btn-font-size: .65rem;" disabled>
+          <i class="fa-solid fa-tags"></i> {{ tag }}
+            <span class="position-absolute top-0 start-100 translate-middle badge bg-danger">
+              {{ tag.post_set.count }}
+            </span>
+        </button>
+      {% endif %}
+      {% if category %}
+        <button type="button" class="btn btn-outline-dark position-relative" style="--bs-btn-padding-y: .10rem; --bs-btn-padding-x: .5rem; --bs-btn-font-size: .75rem;" disabled>
+          {{ category }}
+        </button>
+      {% endif %}
+    </h1>
   </div>
   {% if post_list.exists %}
     {% for p in post_list %}
