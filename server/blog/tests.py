@@ -273,13 +273,75 @@ class TestView(TestCase):
         main_area = soup.find('div', id='main-area')
         self.assertIn('Create New Post', main_area.text)
 
+        tag_str_input = main_area.find('input', id='id_tags_str')
+        self.assertTrue(tag_str_input)
+
         self.client.post(
             '/blog/create_post/',
             {
                 'title': 'ULTRA KILL',
-                'content': 'GGGGGGGGOD  LLLLLIKE'
+                'content': 'GGGGGGGGOD  LLLLLIKE',
+                'tags_str': 'new tag; 갓 댐!!, pthon'
             }
         )
         last_post = Post.objects.last()
         self.assertEqual(last_post.title, "ULTRA KILL")
         self.assertEqual(last_post.author.username, "user_two")
+
+        self.assertEqual(last_post.tags.count(), 3)
+        self.assertTrue(Tag.objects.get(name='new tag'))
+        self.assertTrue(Tag.objects.get(name='갓 댐!!'))
+        self.assertEqual(Tag.objects.count(), 6)
+
+    def test_update_post(self):
+        update_post_url = f'/blog/update_post/{self.post_003.pk}/'
+
+        # no login, no 200
+        response = self.client.get(update_post_url)
+        self.assertNotEqual(response.status_code, 200)
+
+        # yes login, no original author
+        self.assertNotEqual(self.post_003.author, self.user_one)
+        self.client.login(
+            username=self.user_one.username,
+            password='password1'
+        )
+        response = self.client.get(update_post_url)
+        self.assertEqual(response.status_code, 403)
+
+        # yes original author
+        self.client.login(
+            username=self.post_003.author.username,
+            password='password2'
+        )
+        response = self.client.get(update_post_url)
+        self.assertEqual(response.status_code, 200)
+        soup = BeautifulSoup(response.content, 'html.parser')
+
+        self.assertEqual('Edit Post - Blog', soup.title.text)
+        main_area = soup.find('div', id='main-area')
+        self.assertIn('Edit Post', main_area.text)
+
+        tag_str_input = main_area.find('input', id='id_tags_str')
+        self.assertTrue(tag_str_input)
+        self.assertIn('smackdown; samryongee', tag_str_input.attrs['value'])
+
+        response = self.client.post(
+            update_post_url,
+            {
+                'title': '세번째 포스트 맛있당',
+                'content': '뭐 왜요...',
+                'category': self.category_one.pk,
+                'tags_str': 'whatnow; what?, makeupyourmind'
+            },
+            follow=True
+        )
+        soup = BeautifulSoup(response.content, 'html.parser')
+        main_area = soup.find('div', id='main-area')
+        self.assertIn('세번째 포스트 맛있당', main_area.text)
+        self.assertIn('뭐 왜요...', main_area.text)
+        self.assertIn(self.category_one.name, main_area.text)
+        self.assertIn('whatnow', main_area.text)
+        self.assertIn('what?', main_area.text)
+        self.assertIn('makeupyourmind', main_area.text)
+        self.assertNotIn('tagmatch', main_area.text)

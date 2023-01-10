@@ -12,46 +12,57 @@
             <!-- Post header-->
             <header class="mb-4">
                 <!-- Post title-->
-                <h1 class="fw-bolder mb-1">{{ post.title }}</h1>
+                <h1 class="fw-bolder mb-1">{{ post.title }}
+                    {% if user.is_authenticated and user == post.author %}
+                        <a class="btn btn-primary float-end" href="/blog/update_post/{{ post.pk }}" role="button"><i class="fa-solid fa-wrench"></i></a>
+                    {% endif %}
+                </h1>
                 <h5 class="text-muted">{{ post.hook_text }}</h5>
 
                 <!-- ORIGINAL STYLE -->
                 <!-- Post meta content-->
-                <div class="text-muted fst-italic mb-2">{{ post.created_at }} by {{ post.author | upper }}</div>
+                <!-- <div class="text-muted fst-italic mb-2">{{ post.created_at }} by {{ post.author | upper }}</div> -->
                 <!-- Post categories-->
-                {% if post.category %}
+                <!-- {% if post.category %}
                     <span class="badge bg-secondary">{{ post.category }}</span>
                 {% else %}
                     <span class="badge bg-secondary">미분류</span>
-                {% endif %}                
+                {% endif %}                 -->
 
                 <!-- ONE LINE STYLE -->
-                <!-- <div class="card-body">
-                    <div class="container">
-                        <div class="row"> -->
+                <div class="card-body">
+                    <!-- <div class="container"> -->
+                        <!-- <div class="row"> -->
                             <!-- Post meta content-->
-                            <!-- <div class="col-8 text-muted fst-italic mb-2 g-0">{{ post.created_at }} by {{ post.author | upper }}</div> -->
+                            <div class="col-12 text-muted fst-italic mb-2 g-0">{{ post.created_at }} by {{ post.author | upper }}
+                            <!-- <div class='text-muted mb-2 g-0'>{{ post.created_at }} by {{ post.author | upper }} -->
                             <!-- Post categories-->
-                            <!-- <div class="col-4">
                             {% if post.category %}
+                                <span class="badge bg-secondary float-end" style="font-style:normal;">{{ post.category }}</span>
+                            {% else %}
+                                <span class="badge bg-secondary float-end" style="font-style:normal;">미분류</span>
+                            {% endif %}
+                            </div>
+                            <!-- <div class="col-4"> -->
+                            <!-- {% if post.category %}
                                 <span class="badge bg-secondary float-end">{{ post.category }}</span>
                             {% else %}
                                 <span class="badge bg-secondary float-end">미분류</span>
-                            {% endif %}
-                            </div>
-                        </div>
-                    </div>
-                </div> -->
+                            {% endif %} -->
+                            <!-- </div> -->
+                        <!-- </div> -->
+                    <!-- </div> -->
+                </div>
             </header>
             <!-- Preview image figure-->
             {% if post.head_image %}
-                <figure class="mb-4"><img class="img-fluid rounded mx-auto d-block" src="{{ post.head_image.url }}" alt="{{ post.title }} head_image" /></figure>
+                <img class="mb-4 img-fluid rounded mx-auto d-block" src="{{ post.head_image.url }}" alt="{{ post.title }} head_image" /></figure>
             {% else %}
-                <img class="mb-4"><img class="img-fluid rounded mx-auto d-block" src="https://picsum.photos/seed/{{ post.id }}/800/200" alt="random_image"/>
+                <img class="mb-4 img-fluid rounded mx-auto d-block" src="https://picsum.photos/seed/{{ post.id }}/800/200" alt="random_image"/>
             {% endif %}
             <!-- Post content-->
-            <section class="mb-5">
-                <p>{{ post.content }}</p>
+            <section class="mb-2">
+                <p>{{ post.get_content_markdown | safe }}</p>
                 
                 {% if post.tags.exists %}
                     <i class="fa-solid fa-tags"></i>
