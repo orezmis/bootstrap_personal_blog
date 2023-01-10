@@ -24,7 +24,7 @@ urlpatterns = [
     path('', include('single_pages.urls')),
     path('blog/', include('blog.urls')),
     path('markdownx/', include('markdownx.urls')),
-    path('account/', include('allauth.urls')),
+    path('accounts/', include('allauth.urls')),
 ]
 
 
