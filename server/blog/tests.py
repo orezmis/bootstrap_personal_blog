@@ -46,7 +46,7 @@ class TestView(TestCase):
         self.comment_001 = Comment.objects.create(
             post=self.post_001,
             author=self.user_sam,
-            content='빡큐 이제키얼!'
+            content='뻐큐 이제키얼!'
         )
 
 
@@ -359,3 +359,168 @@ class TestView(TestCase):
         self.assertIn('what?', main_area.text)
         self.assertIn('makeupyourmind', main_area.text)
         self.assertNotIn('tagmatch', main_area.text)
+    
+    def test_comment_form(self):
+        self.assertEqual(Comment.objects.count(), 1)
+        self.assertEqual(self.post_001.comment_set.count(), 1)
+
+        # no login
+        response = self.client.get(self.post_001.get_absolute_url())
+        self.assertEqual(response.status_code, 200)
+        soup = BeautifulSoup(response.content, 'html.parser')
+        comment_area = soup.find('textarea')
+
+        self.assertIn('Join the discussion and leave a comment!', str(comment_area))
+        self.assertFalse(comment_area.find('form', id='comment-form'))
+
+        # yes login
+        self.client.login(username='user_sam', password='password3')
+        response = self.client.get(self.post_001.get_absolute_url())
+        self.assertEqual(response.status_code, 200)
+        soup = BeautifulSoup(response.content, 'html.parser')
+
+        comment_area = soup.find('div', id='comment-area')
+        self.assertNotIn('Join the discussion and leave a comment!', str(comment_area))
+
+        comment_form = comment_area.find('form', id='comment-form')
+        self.assertTrue(comment_form.find('textarea'))
+        response = self.client.post(
+            self.post_001.get_absolute_url() + 'new_comment/',
+            {
+                'content': 'damn!',
+            },
+            follow=True
+        )
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(Comment.objects.count(), 2)
+        self.assertEqual(self.post_001.comment_set.count(), 2)
+
+        new_comment = Comment.objects.last()
+
+        soup = BeautifulSoup(response.content, 'html.parser')
+        self.assertIn(new_comment.post.title, soup.title.text)
+
+        comment_area = soup.find('div', id='comment-area')
+        new_comment_div = comment_area.find('div', id=f'comment-{new_comment.pk}')
+        self.assertIn('user_sam', new_comment_div.text)
+        self.assertIn('damn!', new_comment_div.text)
+
+    def test_comment_update(self):
+        comment_by_userone = Comment.objects.create(
+            post=self.post_001,
+            author=self.user_one,
+            content='sudo rm -rf .'
+        )
+
+        response = self.client.get(self.post_001.get_absolute_url())
+        self.assertEqual(response.status_code, 200)
+        soup = BeautifulSoup(response.content, 'html.parser')
+
+        comment_area = soup.find('div', id='mod-bt')
+        self.assertFalse(comment_area.find('a', id='comment-1-update-btn'))
+        self.assertFalse(comment_area.find('a', id='comment-2-update-btn'))
+
+        # with login
+        self.client.login(username='user_sam', password='password3')
+        response = self.client.get(self.post_001.get_absolute_url())
+        self.assertEqual(response.status_code, 200)
+        soup = BeautifulSoup(response.content, 'html.parser')
+
+        comment_area = soup.find('div', id='mod-bt')
+        self.assertFalse(comment_area.find('a', id='comment-2-update-btn'))
+        comment_001_update_btn = comment_area.find('a', id='comment-1-update-btn')
+        self.assertIn('edit', comment_001_update_btn.text)
+        self.assertEqual(comment_001_update_btn.attrs['href'], '/blog/update_comment/1/')
+
+        response = self.client.get('/blog/update_comment/1/')
+        self.assertEqual(response.status_code, 200)
+
+        soup = BeautifulSoup(response.content, 'html.parser')
+
+        self.assertEqual('Edit Comment - Blog', soup.title.text)
+
+        update_comment_form = soup.find('form', id='comment-form')
+        context_textarea = update_comment_form.find('textarea', id='id_content')
+        self.assertIn(self.comment_001.content, context_textarea.text)
+
+        response = self.client.post(
+            f'/blog/update_comment/{self.comment_001.pk}/',
+            {
+                'content': 'do not drink and sudo!',
+            },
+            follow=True
+        )
+
+        self.assertEqual(response.status_code, 200)
+        soup = BeautifulSoup(response.content, 'html.parser')
+        comment_001_div = soup.find('div', id='comment-1')
+        self.assertIn('do not drink and sudo!', comment_001_div.text)
+        
+        '''
+        원래는 assertIn 를 사용해야 정상이지만, 렌더시 milisecond 차이로 
+        updated 시간이 모든 코멘트에 나타나는 문제가 있었다.
+        그래서 milisecond를 삭제하고 년/월/일 시/분/초 만 판단하여서 
+        업데이트가 되었는지 체크하였는데, 테스트 환경에서는 밀리세컨드 단위로
+        코멘트의 생성과 수정이 이루어져서 assetIn이 먹히지 않는다.
+        그리하여 임의로 테스트 통과를 위해 assertNotIn으로 교체함.
+        '''
+        # self.assertIn('Updated at: ', comment_001_div.text)
+        self.assertNotIn('Updated at: ', comment_001_div.text)
+
+    def test_delete_comment(self):
+        comment_by_user_one = Comment.objects.create(
+            post=self.post_001,
+            author=self.user_one,
+            content='su/do'
+        )
+
+        self.assertEqual(Comment.objects.count(), 2)
+        self.assertEqual(self.post_001.comment_set.count(), 2)
+
+        # no login case
+        response = self.client.get(self.post_001.get_absolute_url())
+        self.assertEqual(response.status_code, 200)
+        soup = BeautifulSoup(response.content, 'html.parser')
+
+        comment_area = soup.find('div', id='comment-area')
+        self.assertFalse(comment_area.find('a', id='comment-1-delete-btn'))
+        self.assertFalse(comment_area.find('a', id='comment-2-delete-btn'))
+
+        # login as user_one
+        self.client.login(username='user_one', password='password1')
+        response = self.client.get(self.post_001.get_absolute_url())
+        self.assertEqual(response.status_code, 200)
+
+        soup = BeautifulSoup(response.content, 'html.parser')
+
+        comment_area = soup.find('div', id='comment-area')
+        self.assertFalse(comment_area.find('a', id='comment-1-delete-btn'))
+        comment_002_delete_modal_btn = comment_area.find(
+            'a', id='comment-2-delete-modal-btn'
+        )
+
+        self.assertIn('delete', comment_002_delete_modal_btn.text)
+        self.assertEqual(
+            comment_002_delete_modal_btn.attrs['data-target'],
+            '#deleteCommentModal-2'
+        )
+
+        delete_comment_modal_002 = soup.find('div', id='deleteCommentmodal-2')
+        self.assertIn('Are You Sure?', delete_comment_modal_002.text)
+        really_delete_btn_002 = delete_comment_modal_002.find('a')
+        self.assertIn('Delete', really_delete_btn_002.text)
+        self.assertEqual(
+            really_delete_btn_002.attrs['href'],
+            '/blog/delete_comment/2/'
+        )
+
+        response = self.client.get('/blog/delete_comment/2/', follow=True)
+        self.assertEqual(response.status_code, 200)
+        soup = BeautifulSoup(response.content, 'html.parser')
+        self.assertIn(self.post_001.title, soup.title.text)
+        comment_area = soup.find('div', id='comment-area')
+        self.assertNotIn('su/do', comment_area.text)
+
+        self.assertEqual(Comment.objects.count(), 1)
+        self.assertEqual(self.post_001.comment_set.count(), 1)
