@@ -70,3 +70,23 @@ class Comment(models.Model):
 
     def get_absolute_url(self):
         return f'{self.post.get_absolute_url()}#comment-{self.pk}'
+
+    def get_avatar_url(self):
+        try:
+            if self.author.socialaccount_set.exists():
+                return self.author.socialaccount_set.first().get_avatar_url()
+
+            else:
+                import requests
+                email = str(self.author.email).encode('utf-8')
+                url = f'https://gitlab.com/api/v4/avatar?email={email}&size=25'
+                response = requests.get(url=url)
+                if response.status_code == 200:
+                    data = response.json()
+                    av_url = data['avatar_url']
+                else:
+                    av_url = f'https://gitlab.com/api/v4/avatar?email=example@example.com&size=25'
+                return av_url
+                
+        except:
+            return 'https://dummyimage.com/50x50/ced4da/6c757d.jpg'

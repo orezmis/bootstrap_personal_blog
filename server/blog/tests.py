@@ -36,7 +36,7 @@ class TestView(TestCase):
         )
 
         self.post_003 = Post.objects.create(
-            title='세 번째 포스트',
+            title='세 번째 포스트 입네다 동무',
             content='왜요..',
             author=self.user_two
         )
@@ -524,3 +524,27 @@ class TestView(TestCase):
 
         self.assertEqual(Comment.objects.count(), 1)
         self.assertEqual(self.post_001.comment_set.count(), 1)
+
+    def test_search(self):
+        post_about_ganna = Post.objects.create(
+            title='동무 내래 뭘잘못했나기래?',
+            content='날래날래 하라우!',
+            author=self.user_one
+        )
+
+        response = self.client.get('/blog/search/동무/')
+        self.assertEqual(response.status_code, 200)
+        soup = BeautifulSoup(response.content, 'html.parser')
+
+        main_area = soup.find('div', id='main-area')
+
+        '''
+        이 부분은 더 이쁜 검색결과로 보여주기 위해 바뀌었다.
+        원래는 아래처럼 쌩 텍스트가 보여졌다.
+        '''
+        # self.assertIn('Search: 동무 (2)', main_area.text)
+        self.assertNotIn('Search: 동무 (2)', main_area.text)
+        self.assertNotIn(self.post_001.title, main_area.text)
+        self.assertNotIn(self.post_002.title, main_area.text)
+        self.assertIn(self.post_003.title, main_area.text)
+        self.assertIn(post_about_ganna.title, main_area.text)
