@@ -95,7 +95,7 @@
     <div class="mb-5" id="comment-area">
         <section class="mb-5">
             <div class="card bg-light">
-                <div class="card-body pb-0">
+                <div class="card-body pb-0 mb-2">
                     <!-- Comment form-->
                     {% if user.is_authenticated %}
                         <form id="comment-form" method="POST" action="{{ post.get_absolute_url }}new_comment/">
@@ -104,8 +104,8 @@
                                 {{ comment_form | crispy }}
                                 <!-- <textarea class="form-control" rows="3"></textarea> -->
                             </div>
-                            <div>
-                                <button type="submit" class="btn btn-primary float-end">Submit</button>
+                            <div class="mb-2 float-end">
+                                <button type="submit" class="btn btn-primary">Submit</button>
                             </div>
                         </form>
                     {% else %}
@@ -152,12 +152,38 @@
                                          id="comment-{{ comment.pk }}-update-btn" href="/blog/update_comment/{{ comment.pk }}/">
                                             <i class="fa-solid fa-wrench"></i>&nbsp;&nbsp;edit
                                         </a>
+                                        <a role="button" class="btn btn-sm btn-danger rounded-pill" 
+                                        style="--bs-btn-padding-y: .10rem; --bs-btn-padding-x: .5rem; --bs-btn-font-size: .65rem;"
+                                        id="comment-{{ comment.pk }}-delete-modal-btn" href="#" data-bs-toggle="modal"
+                                        data-bs-target="#deleteCommentModal-{{ comment.pk }}">
+                                            <i class="fa-regular fa-trash-can"></i>&nbsp;&nbsp;delete
+                                        </a>
                                     {% endif %}
                                     {% if comment.created_at|date:"Y-m-d H:M:S" != comment.modified_at|date:"Y-m-d H:M:S" %}
                                         <p class="text-muted mb-0 fw-lighter fst-italic"><small><small>Updated at: {{ comment.modified_at }}</small></small></p>
                                     {% endif %}
                                     </div>
                                     {{ comment.content | linebreaks }}
+                                </div>
+                            </div>
+
+                            <!-- Modal -->
+                            <div class="modal fade" id="deleteCommentModal-{{ comment.pk }}" tabindex="-1" 
+                             aria-labelledby="deleteCommentModalLable" aria-hidden="true">
+                                <div class="modal-dialog" role="document">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                            <h5 class="modal-title" id="deleteModalLable">4 Real?</h5>
+                                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-lable="Close"></button>
+                                        </div>
+                                        <div class="modal-body">
+                                            <del>{{ comment | linebreaks }}</del>
+                                        </div>
+                                        <div class="modal-footer">
+                                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                                            <a role="button" class="btn btn-danger" href="/blog/delete_comment/{{ comment.pk }}/">Delete</a> 
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         {% endfor %}
