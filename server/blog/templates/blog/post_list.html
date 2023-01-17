@@ -4,7 +4,7 @@
 
 {% if user.is_authenticated %}
   {% if user.is_superuser or user.is_staff %}
-    <a class="btn btn-primary float-end" href="/blog/create_post/" role="button"><i class="fa-solid fa-pen-to-square"></i></a>
+    <a class="btn btn-primary float-end" href="/create_post/" role="button"><i class="fa-solid fa-pen-to-square"></i></a>
   {% endif %}
 {% endif %}
   <div class="container">

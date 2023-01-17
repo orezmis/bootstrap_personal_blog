@@ -57,12 +57,12 @@ class TestView(TestCase):
         self.assertIn(f'{self.category_two.name} ({self.category_two.post_set.count()})', categories_card.text)
         self.assertIn(f'미분류', categories_card.text)
 
-    # /blog/ 경로에 접속해서 원하는 페이지가 나오는지 확인하며, 게시물이 잘 쓰여지는지 확인하는 테스트 시나리오
+    # / 경로에 접속해서 원하는 페이지가 나오는지 확인하며, 게시물이 잘 쓰여지는지 확인하는 테스트 시나리오
     def test_post_list(self):
         # with posts
         self.assertEqual(Post.objects.count(), 3)
 
-        response = self.client.get('/blog/')
+        response = self.client.get('/')
         self.assertEqual(response.status_code, 200)
         soup = BeautifulSoup(response.content, 'html.parser')
 
@@ -98,7 +98,7 @@ class TestView(TestCase):
         # without post
         Post.objects.all().delete()
         self.assertEqual(Post.objects.count(), 0)
-        response = self.client.get('/blog/')
+        response = self.client.get('/')
         soup = BeautifulSoup(response.content, 'html.parser')
 
         main_area = soup.find('div', id='main-area')
@@ -107,7 +107,7 @@ class TestView(TestCase):
 
         # DEPRECATED BELOW
         # # 1. 포스트(게시글) 목록 페이지를 가져온다
-        # response = self.client.get('/blog/')
+        # response = self.client.get('/')
         
         # # 1.1. 정상 (200) 인지 확인
         # self.assertEqual(response.status_code, 200)
@@ -150,8 +150,8 @@ class TestView(TestCase):
         # # 3.1. 위에서 2개 생성한대로 포스트가 2개 생성되었는지 확인
         # self.assertEqual(Post.objects.count(), 2)
 
-        # # 3.2. /blog/ 경로로 재접속 (새로고침)
-        # response = self.client.get('/blog/')
+        # # 3.2. / 경로로 재접속 (새로고침)
+        # response = self.client.get('/')
 
         # # 3.3. 리스폰스 200 ok 확인
         # self.assertEqual(response.status_code, 200)
@@ -181,7 +181,7 @@ class TestView(TestCase):
             author=self.user_one
         )
 
-        self.assertEqual(self.post_001.get_absolute_url(), '/blog/1/')
+        self.assertEqual(self.post_001.get_absolute_url(), '/1/')
 
         response = self.client.get(self.post_001.get_absolute_url())
         self.assertEqual(response.status_code, 200)
@@ -218,17 +218,17 @@ class TestView(TestCase):
     
     def navbar_test(self, soup):
         navbar = soup.nav
-        self.assertIn('Blog', navbar.text)
+        self.assertIn('Main', navbar.text)
         self.assertIn('About Me', navbar.text)
 
         logo_btn = navbar.find('a', text='OREZMIS')
         self.assertEqual(logo_btn.attrs['href'], '/')
 
-        home_btn = navbar.find('a', text='Home')
+        home_btn = navbar.find('a', text='Main')
         self.assertEqual(home_btn.attrs['href'], '/')
 
-        blog_btn = navbar.find('a', text='Blog')
-        self.assertEqual(blog_btn.attrs['href'], '/blog/')
+        # blog_btn = navbar.find('a', text='Main')
+        # self.assertEqual(blog_btn.attrs['href'], '/')
 
         about_me_btn = navbar.find('a', text='About Me')
         self.assertEqual(about_me_btn.attrs['href'], '/about_me/')
@@ -269,17 +269,17 @@ class TestView(TestCase):
 
     def test_create_post(self):
         # no login, no response 200!
-        response = self.client.get('/blog/create_post/')
+        response = self.client.get('/create_post/')
         self.assertNotEqual(response.status_code, 200)
 
         # no staff login case
         self.client.login(username='user_one', password='password1')
-        response = self.client.get('/blog/create_post/')
+        response = self.client.get('/create_post/')
         self.assertNotEqual(response.status_code, 200)
         
         # yes staff login, yes 200
         self.client.login(username='user_two', password='password2')
-        response = self.client.get('/blog/create_post/')
+        response = self.client.get('/create_post/')
         self.assertEqual(response.status_code, 200)
         soup = BeautifulSoup(response.content, 'html.parser')
 
@@ -291,7 +291,7 @@ class TestView(TestCase):
         self.assertTrue(tag_str_input)
 
         self.client.post(
-            '/blog/create_post/',
+            '/create_post/',
             {
                 'title': 'ULTRA KILL',
                 'content': 'GGGGGGGGOD  LLLLLIKE',
@@ -308,7 +308,7 @@ class TestView(TestCase):
         self.assertEqual(Tag.objects.count(), 6)
 
     def test_update_post(self):
-        update_post_url = f'/blog/update_post/{self.post_003.pk}/'
+        update_post_url = f'/update_post/{self.post_003.pk}/'
 
         # no login, no 200
         response = self.client.get(update_post_url)
@@ -431,9 +431,9 @@ class TestView(TestCase):
         self.assertFalse(comment_area.find('a', id='comment-2-update-btn'))
         comment_001_update_btn = comment_area.find('a', id='comment-1-update-btn')
         self.assertIn('edit', comment_001_update_btn.text)
-        self.assertEqual(comment_001_update_btn.attrs['href'], '/blog/update_comment/1/')
+        self.assertEqual(comment_001_update_btn.attrs['href'], '/update_comment/1/')
 
-        response = self.client.get('/blog/update_comment/1/')
+        response = self.client.get('/update_comment/1/')
         self.assertEqual(response.status_code, 200)
 
         soup = BeautifulSoup(response.content, 'html.parser')
@@ -445,7 +445,7 @@ class TestView(TestCase):
         self.assertIn(self.comment_001.content, context_textarea.text)
 
         response = self.client.post(
-            f'/blog/update_comment/{self.comment_001.pk}/',
+            f'/update_comment/{self.comment_001.pk}/',
             {
                 'content': 'do not drink and sudo!',
             },
@@ -512,10 +512,10 @@ class TestView(TestCase):
         self.assertIn('Delete', really_delete_btn_002.text)
         self.assertEqual(
             really_delete_btn_002.attrs['href'],
-            '/blog/delete_comment/2/'
+            '/delete_comment/2/'
         )
 
-        response = self.client.get('/blog/delete_comment/2/', follow=True)
+        response = self.client.get('/delete_comment/2/', follow=True)
         self.assertEqual(response.status_code, 200)
         soup = BeautifulSoup(response.content, 'html.parser')
         self.assertIn(self.post_001.title, soup.title.text)
@@ -532,7 +532,7 @@ class TestView(TestCase):
             author=self.user_one
         )
 
-        response = self.client.get('/blog/search/동무/')
+        response = self.client.get('/search/동무/')
         self.assertEqual(response.status_code, 200)
         soup = BeautifulSoup(response.content, 'html.parser')
 
