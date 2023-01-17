@@ -5,6 +5,7 @@ services:
     build:
       context: ./nginx
       dockerfile: Dockerfile
+    image: 'orezmis-blog-nginx:1.0.0'
     volumes:
       - ./nginx/conf.d:/etc/nginx/conf.d
       - ./server/_static:/app/_static
@@ -23,9 +24,9 @@ services:
     stdin_open: true
     tty: true
     volumes:
+      - ./:/app
       - nginx:/app/nginx
       - db:/app/db_data
-      - ./:/app
     ports:
       - 8000
     env_file:

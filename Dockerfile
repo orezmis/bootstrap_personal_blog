@@ -29,7 +29,6 @@ cd ./server && gunicorn api.wsgi:application --bind 0.0.0.0:8000 \
 ;else \
 echo "[INFO] >> Ready to luanch server, checking new dependencies, please wait..." && \
 source ./venv/bin/activate && \
-pip install --upgrade pip && \
 pip install -r requirements.txt && \
 cd ./server && gunicorn api.wsgi:application --bind 0.0.0.0:8000 \
 ;fi
