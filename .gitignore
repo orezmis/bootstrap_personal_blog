@@ -103,6 +103,7 @@ celerybeat.pid
 
 # Environments
 .env
+.env.db
 .venv
 env/
 venv/
@@ -139,3 +140,4 @@ dmypy.json
 **/migrations/
 **/_media/
 *.old
+db_data/

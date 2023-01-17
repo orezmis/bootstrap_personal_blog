@@ -1,0 +1,56 @@
+version: '3.9'
+services:
+  blog_nginx:
+    container_name: 'orezmis-blog-nginx'
+    build:
+      context: ./nginx
+      dockerfile: Dockerfile
+    volumes:
+      - ./nginx/conf.d:/etc/nginx/conf.d
+      - ./server/_static:/app/_static
+      - ./server/_media:/app/_media
+    ports:
+      - "${PORT}:80"
+    depends_on:
+      - web
+
+  web:
+    container_name: 'orezmis-blog-web'
+    image: 'orezmis-blog-web:1.0.0'
+    build:
+      context: ./
+      dockerfile: Dockerfile
+    stdin_open: true
+    tty: true
+    volumes:
+      - nginx:/app/nginx
+      - db:/app/db_data
+      - ./:/app
+    ports:
+      - 8000
+    env_file:
+      - ./.env
+    environment:
+      TZ: "Asia/Seoul"
+    restart: always
+  
+  postgres:
+    image: postgres:12.0-alpine
+    container_name: 'orezmis-blog-db'
+    volumes:
+      - ./db_data:/var/lib/postgresql/data/
+    env_file:
+      - ./.env
+    environment:
+      - POSTGRES_USER=${SQL_USER}
+      - POSTGRES_PASSWORD=${SQL_PASSWORD}
+      - POSTGRES_DB=${SQL_DATABASE}
+
+volumes:
+  nginx:
+  db:
+
+networks:
+    default:
+      external:
+        name: common_external_service_network

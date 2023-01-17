@@ -2,9 +2,10 @@
 {% load static %}
 <html>
     <head>
-        <title>{% block head_title %}Blog{% endblock %}</title>
+        <title>{% block head_title %}orezmis: Main{% endblock %}</title>
+        <link rel="shortcut icon" type="image/png" href="{% static 'favicon.ico' %}"/>
         <link rel="stylesheet" href="{% static 'blog/bootstrap/bootstrap.min.css' %}" media="screen">
-        <!-- <link href="./bootstrap/css/bootstrap.min.css" rel="stylesheet" type="text/css"> -->
+        <link rel="stylesheet" href="{% static 'single_pages/css/about_me.css' %}" media="screen">
         <script src="https://kit.fontawesome.com/4fd514a4d4.js" crossorigin="anonymous"></script>
     </head>
     <body>
@@ -74,7 +75,8 @@
             }
         });
       </script>
-      {% include 'blog/footer.html' %}
-
+      <div class="fixed-bottom mt-4">
+        {% include 'blog/footer.html' %}
+    </div>
     </body>
 </html>

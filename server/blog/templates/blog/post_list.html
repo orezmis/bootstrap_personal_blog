@@ -10,7 +10,13 @@
   <div class="container">
     <h1>
       Blog
-      {% if search_info %}<small class="text-muted">{{ search_info }}</small>
+      {% if search_info %}
+        <small class="text-muted">&nbsp;&nbsp;<i class="fa-solid fa-magnifying-glass"></i> Searched term: </small>
+        <button type="button" class="btn btn-secondary position-relative" 
+         style="--bs-btn-padding-y: .15rem; --bs-btn-padding-x: .5rem; --bs-btn-font-size: .90rem;"
+         disabled>
+          {{ search_info }} <span class="badge text-bg-dark">{{ search_count }}</span>
+        </button>
       {% endif %}
       {% if tag %}
         <button type="button" class="btn btn-dark position-relative" style="--bs-btn-padding-y: .10rem; --bs-btn-padding-x: .5rem; --bs-btn-font-size: .65rem;" disabled>
@@ -69,13 +75,14 @@
     {% endfor %}
   {% else %}
     <!-- <h3>¯\_(ツ)_/¯</h3> -->
-    <h4>아직 게시물이 없습니다. ¯\_(ツ)_/¯</h4>
+    <h4>아직 게시물이 없습니다.&nbsp;&nbsp;&nbsp;&nbsp;¯\_(ツ)_/¯</h4>
   {% endif %}
 
   {% if is_paginated %}
     <nav aria-label="Pagination">
       <hr class="my-0" />
-      <ul class="pagination justify-content-center my-4">
+      <div class="d-flex justify-content-center my-2">{{ page_obj }}</div>
+      <ul class="pagination justify-content-center mb-4">
         {% if page_obj.has_previous %}
         <li class="page-item"><a class="page-link me-2" href="?page={{ page_obj.previous_page_number }}">
         <i class="fa-solid fa-arrow-left"></i>&nbsp;&nbsp;Newer</a></li>
