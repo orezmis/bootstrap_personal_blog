@@ -25,8 +25,8 @@ services:
     tty: true
     volumes:
       - ./:/app
-      - nginx:/app/nginx
-      - db:/app/db_data
+      - /app/nginx
+      - /app/db_data
     ports:
       - 8000
     env_file:
@@ -47,9 +47,9 @@ services:
       - POSTGRES_PASSWORD=${SQL_PASSWORD}
       - POSTGRES_DB=${SQL_DATABASE}
 
-volumes:
-  nginx:
-  db:
+# volumes:
+#   nginx:
+#   db:
 
 networks:
     default:
